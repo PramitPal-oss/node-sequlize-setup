@@ -11,5 +11,6 @@ export const sequelize = new Sequelize(
     port: env.DB_PORT,
     dialect: 'mysql',
     logging: (msg) => dbLogger.info(msg), // 👈 DB logs
+    storage: ':memory:',
   },
 );
