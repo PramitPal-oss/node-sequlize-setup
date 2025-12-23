@@ -1,20 +1,31 @@
 import { sequelize } from '@config/database';
-import { DataTypes } from 'sequelize';
+import bcrypt from 'bcrypt';
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
-const UserModel = sequelize.define(
-  'User',
+class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
+  declare id: CreationOptional<number>;
+  declare first_name: string;
+  declare last_name: string;
+  declare email: string;
+  declare phone: string | null;
+  declare address: string | null;
+  declare password: string;
+  declare username: string;
+  declare app_ids?: number[];
+}
+
+UserModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-      allowNull: false,
       field: 'ID',
     },
     first_name: {
       type: DataTypes.STRING(100),
-      field: 'FIRST_NAME',
       allowNull: false,
+      field: 'FIRST_NAME',
       validate: {
         isAlpha: true,
         notEmpty: true,
@@ -22,8 +33,8 @@ const UserModel = sequelize.define(
     },
     last_name: {
       type: DataTypes.STRING(100),
+      allowNull: false,
       field: 'LAST_NAME',
-      allowNull: true,
       validate: {
         isAlpha: true,
         notEmpty: true,
@@ -32,8 +43,8 @@ const UserModel = sequelize.define(
     email: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      field: 'EMAIL',
       unique: true,
+      field: 'EMAIL',
       validate: {
         isEmail: true,
         notEmpty: true,
@@ -49,10 +60,10 @@ const UserModel = sequelize.define(
       allowNull: true,
       field: 'ADDRESS',
     },
-    password_hash: {
+    password: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      field: 'PASSWORD_HASH',
+      field: 'PASSWORD',
     },
     username: {
       type: DataTypes.STRING,
@@ -66,10 +77,24 @@ const UserModel = sequelize.define(
     },
   },
   {
+    sequelize,
     tableName: 'users',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: true,
+    hooks: {
+      beforeCreate: async (user) => {
+        if (user.password) {
+          user.password = await bcrypt.hash(user.password, 10);
+        }
+      },
+
+      beforeUpdate: async (user) => {
+        if (user.changed('password')) {
+          user.password = await bcrypt.hash(user.password, 10);
+        }
+      },
+    },
   },
 );
 

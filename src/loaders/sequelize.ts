@@ -1,17 +1,23 @@
-import { env } from '@config/env';
+import { sequelize } from '@config/database';
 import { logger } from '@utils/logger';
-import { sequelize } from 'models';
 
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     logger.info('Database connected successfully');
-    await sequelize.sync({
-      alter: env.NODE_ENV === 'development',
-    });
-  } catch (error) {
+    // await sequelize.sync();
+  } catch (error: any) {
     console.log(error);
-    logger.error('Database connection failed');
+    logger.error('Database connection failed', {
+      message: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   }
 };
+
+/**
+ {
+      alter: env.NODE_ENV === 'development',
+    }
+ */

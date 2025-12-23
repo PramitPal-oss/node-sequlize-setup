@@ -1,4 +1,3 @@
-import { sequelize } from '@config/database';
 import AppModel from './app.model';
 import UserModel from './user.model';
 import UserAppModel from './userApp.model';
@@ -15,4 +14,4 @@ AppModel.belongsToMany(UserModel, {
   otherKey: 'user_id',
 });
 
-export { AppModel, sequelize, UserAppModel, UserModel };
+export { AppModel, UserAppModel, UserModel };

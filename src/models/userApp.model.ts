@@ -1,8 +1,12 @@
 import { sequelize } from '@config/database';
-import { DataTypes } from 'sequelize';
+import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+class UserAppModel extends Model<InferAttributes<UserAppModel>, InferCreationAttributes<UserAppModel>> {
+  declare user_id: number;
+  declare app_id: number;
+  declare assigned_at: Date;
+}
 
-const UserAppModel = sequelize.define(
-  'UserApp',
+UserAppModel.init(
   {
     user_id: {
       type: DataTypes.BIGINT,
@@ -34,6 +38,7 @@ const UserAppModel = sequelize.define(
     },
   },
   {
+    sequelize,
     tableName: 'user_apps',
     timestamps: false,
   },

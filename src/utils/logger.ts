@@ -5,7 +5,7 @@ const fileFormat = winston.format.combine(
   winston.format.errors({ stack: true }),
   winston.format.printf(({ timestamp, level, message, stack }) => {
     return stack
-      ? `${timestamp} [${level.toUpperCase()}]: ${stack}`
+      ? `${timestamp} [${level.toUpperCase()}]: ${message}\n ${JSON.stringify(stack)}`
       : `${timestamp} [${level.toUpperCase()}]: ${message}`;
   }),
 );
@@ -13,9 +13,10 @@ const fileFormat = winston.format.combine(
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp(),
-  winston.format.printf(
-    ({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`,
-  ),
+  winston.format.errors({ stack: true }), // 🔑 REQUIRED
+  winston.format.printf(({ timestamp, level, message, stack }) => {
+    return stack ? `${timestamp} [${level}]: ${stack}` : `${timestamp} [${level}]: ${message}`;
+  }),
 );
 
 export const logger = winston.createLogger({

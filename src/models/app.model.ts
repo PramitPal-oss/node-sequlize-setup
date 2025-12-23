@@ -1,8 +1,15 @@
 import { sequelize } from '@config/database';
-import { DataTypes } from 'sequelize';
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
-const AppModel = sequelize.define(
-  'App',
+class AppModel extends Model<InferAttributes<AppModel>, InferCreationAttributes<AppModel>> {
+  declare id: CreationOptional<number>;
+  declare app_code: string;
+  declare app_name: string;
+  declare description: string;
+  declare is_active: boolean;
+}
+
+AppModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -35,6 +42,7 @@ const AppModel = sequelize.define(
     },
   },
   {
+    sequelize,
     tableName: 'apps',
     timestamps: true,
     createdAt: 'created_at',
