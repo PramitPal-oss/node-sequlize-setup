@@ -22,3 +22,12 @@ export const loginUserSchema = Joi.object({
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
   app_ids: Joi.array().min(1).items(Joi.number().integer().positive()).required(),
 });
+
+export const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+export const resetPasswordSchema = Joi.object({
+  token: Joi.string().required(),
+  new_password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+});

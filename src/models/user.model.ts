@@ -1,5 +1,6 @@
 import { sequelize } from '@config/database';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
 class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
@@ -13,6 +14,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
   declare username: string;
   declare app_ids?: number[];
   declare password_changed_at: Date | null;
+  declare password_reset_token: string | null;
 
   async comparePassword(candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
@@ -25,6 +27,17 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
       return jwtTimeStamp < passwordChangedTime;
     }
     return false;
+  }
+
+  createPasswordResetToken(): string {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    this.password_changed_at = new Date(Date.now() + 10 * 60 * 1000);
+    this.password_reset_token = hashedToken;
+
+    return resetToken;
   }
 }
 
@@ -94,6 +107,11 @@ UserModel.init(
       allowNull: true,
       field: 'PASSWORD_CHANGED_AT',
     },
+    password_reset_token: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'PASSWORD_RESET_TOKEN',
+    },
   },
   {
     sequelize,
@@ -104,13 +122,13 @@ UserModel.init(
     hooks: {
       beforeCreate: async (user) => {
         if (user.password) {
-          user.password = await bcrypt.hash(user.password, 15);
+          user.password = await bcrypt.hash(user.password, 12);
         }
       },
 
       beforeUpdate: async (user) => {
         if (user.changed('password')) {
-          user.password = await bcrypt.hash(user.password, 15);
+          user.password = await bcrypt.hash(user.password, 12);
           user.password_changed_at = new Date(Date.now() - 1000);
         }
       },

@@ -15,3 +15,13 @@ export interface LoginInterface {
   password: string;
   app_ids: number[];
 }
+
+export interface EmailOptionsInterface {
+  to: string;
+  subject: string;
+  text: string;
+}
+
+export interface ForgotpasswordInterface {
+  email: string;
+}

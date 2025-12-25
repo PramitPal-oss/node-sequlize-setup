@@ -1,7 +1,7 @@
 import { sequelize } from '@config/database';
 import { AppError } from '@utils/AppError';
 import { generateToken } from '@utils/jwt';
-import { LoginInterface, UserInterface } from 'interface/UserInterface';
+import { LoginInterface, UserInterface } from 'interface/authInterface';
 import { AppModel, UserAppModel, UserModel } from 'models';
 import { Op } from 'sequelize';
 
@@ -72,4 +72,15 @@ export const loginUser = async (data: LoginInterface) => {
   });
 
   return { user, token };
+};
+
+export const forgotPassword = async (email: string) => {
+  const user = await UserModel.findOne({ where: { email } });
+
+  if (!user) throw new AppError('No user found with the provided email', 404, 'NoUserFound');
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validate: false });
+
+  return resetToken;
 };

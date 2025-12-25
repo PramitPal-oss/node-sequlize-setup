@@ -2,6 +2,7 @@ import { applySecurity } from '@middlewares/ApplySecurity';
 import { globalErrorHandler } from '@middlewares/globalErrorHandler';
 import { apiLimiter } from '@middlewares/rateLimit';
 import authRoutes from '@routes/authRoutes';
+import { AppError } from '@utils/AppError';
 import { httpLogger } from '@utils/httpLogger';
 import express from 'express';
 import morgan from 'morgan';
@@ -22,7 +23,12 @@ export const loadExpress = () => {
   // 🌍 Apply to all /api routes
   app.use('/api', apiLimiter);
 
-  app.use('/api/users', authRoutes);
+  app.use('/api/v1/user', authRoutes);
+
+  // 404 (must be after routes)
+  app.use((req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  });
 
   app.use(globalErrorHandler);
 

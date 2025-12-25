@@ -12,4 +12,8 @@ export const env = {
   DB_PASSWORD: process.env.DB_PASSWORD!,
   JWT_SECRET: process.env.JWT_SECRET!,
   EXPIRATION_TIME: process.env.EXPIRATION_TIME!,
+  EMAIL_USERNAME: process.env.EMAIL_USERNAME!,
+  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD!,
+  EMAIL_HOST: process.env.EMAIL_HOST!,
+  EMAIL_PORT: Number(process.env.EMAIL_PORT) || 587,
 };
