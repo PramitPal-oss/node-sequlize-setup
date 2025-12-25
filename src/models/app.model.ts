@@ -45,8 +45,8 @@ AppModel.init(
     sequelize,
     tableName: 'apps',
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: true,
+    createdAt: 'CREATED_AT',
+    updatedAt: 'UPDATED_AT',
   },
 );
 

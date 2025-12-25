@@ -12,9 +12,19 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
   declare password: string;
   declare username: string;
   declare app_ids?: number[];
+  declare password_changed_at: Date | null;
 
   async comparePassword(candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
+  }
+
+  async checkjWtTime(jwtTimeStamp: number): Promise<boolean> {
+    if (this.password_changed_at) {
+      const passwordChangedTime = Math.floor(this.password_changed_at.getTime() / 1000);
+
+      return jwtTimeStamp < passwordChangedTime;
+    }
+    return false;
   }
 }
 
@@ -79,23 +89,29 @@ UserModel.init(
         notEmpty: true,
       },
     },
+    password_changed_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'PASSWORD_CHANGED_AT',
+    },
   },
   {
     sequelize,
     tableName: 'users',
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: true,
+    createdAt: 'CREATED_AT',
+    updatedAt: 'UPDATED_AT',
     hooks: {
       beforeCreate: async (user) => {
         if (user.password) {
-          user.password = await bcrypt.hash(user.password, 10);
+          user.password = await bcrypt.hash(user.password, 15);
         }
       },
 
       beforeUpdate: async (user) => {
         if (user.changed('password')) {
-          user.password = await bcrypt.hash(user.password, 10);
+          user.password = await bcrypt.hash(user.password, 15);
+          user.password_changed_at = new Date(Date.now() - 1000);
         }
       },
     },

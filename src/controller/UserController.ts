@@ -4,11 +4,11 @@ import { LoginInterface, UserInterface } from 'interface/UserInterface';
 import { createUserWithApps, loginUser } from 'service/UserService';
 
 export const CreateUserController = catchAsync(async (req: Request, res: Response) => {
-  const user = await createUserWithApps(req.body as UserInterface);
+  const { first_name, last_name, email } = await createUserWithApps(req.body as UserInterface);
 
   res.status(201).json({
     success: true,
-    data: user,
+    data: { first_name, last_name, email },
     message: 'User created successfully',
   });
 });

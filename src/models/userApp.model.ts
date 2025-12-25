@@ -40,7 +40,9 @@ UserAppModel.init(
   {
     sequelize,
     tableName: 'user_apps',
-    timestamps: false,
+    timestamps: true,
+    createdAt: 'CREATED_AT',
+    updatedAt: 'UPDATED_AT',
   },
 );
 

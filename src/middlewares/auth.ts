@@ -1,21 +1,32 @@
+import { env } from '@config/env';
+import { AppError } from '@utils/AppError';
+import { catchAsync } from '@utils/catchAsync';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import UserModel from 'models/user.model';
+import { JwtUserPayload } from 'types/jwt';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const token = req.cookies?.access_token || req.headers.authorization?.split(' ')[1];
+export const authMiddleware = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies?.access_token || req.headers.authorization?.split(' ')[1];
 
-    if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+  if (!token) return next(new AppError('Unauthorized!', 400, 'Unauthorized'));
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    console.log(decoded);
+  const decoded = jwt.verify(token, env.JWT_SECRET!) as JwtUserPayload;
 
-    req.user = decoded; // { userId, email }
+  const user = await UserModel.scope('withPassword').findOne({
+    where: {
+      id: decoded.userId,
+    },
+  });
 
-    next();
-  } catch {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-};
+  if (!user) return next(new AppError('No user found!', 400, 'NoUserFound'));
+
+  const isPasswordChanged = await user.checkjWtTime(decoded.iat!);
+
+  if (isPasswordChanged)
+    return next(new AppError('Password changed recently. Please log in again.', 401, 'PasswordChanged'));
+
+  req.user = decoded; // { userId, email }
+
+  next();
+});
