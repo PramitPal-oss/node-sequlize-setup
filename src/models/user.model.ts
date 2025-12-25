@@ -12,6 +12,10 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
   declare password: string;
   declare username: string;
   declare app_ids?: number[];
+
+  async comparePassword(candidatePassword: string): Promise<boolean> {
+    return bcrypt.compare(candidatePassword, this.password);
+  }
 }
 
 UserModel.init(
@@ -93,6 +97,20 @@ UserModel.init(
         if (user.changed('password')) {
           user.password = await bcrypt.hash(user.password, 10);
         }
+      },
+    },
+    // 🔐 DEFAULT: password hidden
+    defaultScope: {
+      attributes: {
+        exclude: ['password'],
+      },
+    },
+
+    scopes: {
+      withPassword: {
+        attributes: {
+          include: ['password'],
+        },
       },
     },
   },

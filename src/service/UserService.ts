@@ -1,8 +1,11 @@
 import { sequelize } from '@config/database';
 import { AppError } from '@utils/AppError';
+import { generateToken } from '@utils/jwt';
+import { LoginInterface, UserInterface } from 'interface/UserInterface';
 import { AppModel, UserAppModel, UserModel } from 'models';
+import { Op } from 'sequelize';
 
-export const createUserWithApps = async (data: UserModel) => {
+export const createUserWithApps = async (data: UserInterface) => {
   const { app_ids, username, first_name, last_name, email, password } = data;
 
   return sequelize.transaction(async (t) => {
@@ -39,4 +42,34 @@ export const createUserWithApps = async (data: UserModel) => {
 
     return user;
   });
+};
+
+export const loginUser = async (data: LoginInterface) => {
+  const { username, password, app_ids } = data;
+
+  const user = await UserModel.scope('withPassword').findOne({
+    where: {
+      [Op.or]: [{ email: username }, { username: username }],
+    },
+  });
+
+  if (!user || !(await user.comparePassword(password))) {
+    throw new AppError('Invalid username or password', 401, 'AuthenticationFailed');
+  }
+
+  const userApps = await UserAppModel.findAll({
+    where: {
+      user_id: user.id,
+      app_id: app_ids,
+    },
+  });
+
+  if (userApps.length === 0) throw new AppError('User does not have access to the specified apps', 403, 'AccessDenied');
+
+  const token = generateToken({
+    userId: user.id,
+    email: user.email,
+  });
+
+  return { user, token };
 };

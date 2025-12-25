@@ -1,11 +1,12 @@
 import { authLimiter } from '@middlewares/rateLimit';
 import { validate } from '@middlewares/validate';
-import { CreateUserController } from 'controller/UserController';
+import { CreateUserController, LoginUserController } from 'controller/UserController';
 import { Router } from 'express';
-import { userSchemaCreate } from 'validator/UserValidation';
+import { loginUserSchema, userSchemaCreate } from 'validator/UserValidation';
 
 const authRoutes = Router();
 
 authRoutes.post('/signIn', authLimiter, validate(userSchemaCreate), CreateUserController);
+authRoutes.post('/login', authLimiter, validate(loginUserSchema), LoginUserController);
 
 export default authRoutes;

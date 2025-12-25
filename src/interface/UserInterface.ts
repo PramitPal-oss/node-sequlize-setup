@@ -7,4 +7,11 @@ export interface UserInterface {
   address?: string;
   password: string;
   username: string;
+  app_ids: number[];
+}
+
+export interface LoginInterface {
+  username: string;
+  password: string;
+  app_ids: number[];
 }

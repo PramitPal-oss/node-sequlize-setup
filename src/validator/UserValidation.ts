@@ -1,4 +1,3 @@
-import { NextFunction } from 'express';
 import Joi from 'joi';
 
 export const userSchemaCreate = Joi.object({
@@ -16,17 +15,10 @@ export const userSchemaUpdate = Joi.object({
   username: Joi.string().alphanum().min(3).max(30),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
   email: Joi.string().email(),
-  birthdate: Joi.date().less('now'),
 });
 
-export const validateRequest = (validationschema: Joi.ObjectSchema<any>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const { error } = validationschema.required().validate(req.body, { abortEarly: false });
-
-    if (error) {
-      error.isJoi = true; // so globalErrorHandler can detect it
-      return next(error);
-    }
-    next();
-  };
-};
+export const loginUserSchema = Joi.object({
+  username: Joi.string().alphanum().min(3).max(30).required().alphanum(),
+  password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+  app_ids: Joi.array().min(1).items(Joi.number().integer().positive()).required(),
+});
