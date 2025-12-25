@@ -14,8 +14,8 @@ const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp(),
   winston.format.errors({ stack: true }), // 🔑 REQUIRED
-  winston.format.printf(({ timestamp, level, message, stack }) => {
-    return stack ? `${timestamp} [${level}]: ${stack}` : `${timestamp} [${level}]: ${message}`;
+  winston.format.printf(({ timestamp, level, message }) => {
+    return `${timestamp} [${level}]: ${message}`;
   }),
 );
 

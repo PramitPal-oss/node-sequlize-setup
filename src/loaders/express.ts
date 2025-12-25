@@ -10,8 +10,6 @@ export const loadExpress = () => {
   const app = express();
   // Security & parsing
   applySecurity(app);
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
 
   app.use(
     morgan('combined', {

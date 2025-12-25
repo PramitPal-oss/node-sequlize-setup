@@ -13,7 +13,7 @@ export const createUserWithApps = async (data: UserModel) => {
       transaction: t,
     });
 
-    if (apps.length !== app_ids.length) throw new AppError('One or more App IDs are invalid', 400);
+    if (apps.length !== app_ids.length) throw new AppError('One or more App IDs are invalid', 400, 'InvalidAppIDs');
 
     const user = await UserModel.create(
       {

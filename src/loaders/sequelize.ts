@@ -6,11 +6,11 @@ export const connectDB = async () => {
     await sequelize.authenticate();
     logger.info('Database connected successfully');
     // await sequelize.sync();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log(error);
     logger.error('Database connection failed', {
-      message: error.message,
-      stack: error.stack,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
     });
     process.exit(1);
   }
@@ -18,6 +18,6 @@ export const connectDB = async () => {
 
 /**
  {
-      alter: env.NODE_ENV === 'development',
+      alter: env.NODE_E NV === 'development',
     }
  */

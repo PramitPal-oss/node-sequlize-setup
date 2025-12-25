@@ -6,43 +6,34 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 
 export const applySecurity = (app: Express) => {
-  // basic protections
   app.disable('x-powered-by');
-  app.use(helmet());
 
-  // CSP example (tighten gradually as needed)
   app.use(
-    helmet.contentSecurityPolicy({
-      useDefaults: true,
-      directives: {
-        'default-src': ["'self'"],
-        'img-src': ["'self'", 'data:'],
-        'object-src': ["'none'"],
-        'upgrade-insecure-requests': [],
+    helmet({
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:'],
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: [],
+        },
       },
     }),
   );
 
-  // CORS
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN?.split(',') || '*',
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false,
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     }),
   );
 
-  // Body parsing + size limits + enforce JSON
-  app.use(express.json({ limit: '50kb', type: 'application/json' }));
+  app.use(express.json({ limit: '50kb' }));
   app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
-  // Sanitizers
-  // app.use(mongoSanitize());
-  // app.use(xssClean());
-
-  // Prevent HTTP Parameter Pollution
   app.use(hpp());
-
-  // Gzip
   app.use(compression());
 };
