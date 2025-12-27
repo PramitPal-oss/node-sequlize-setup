@@ -7,7 +7,7 @@ import {
   LoginUserController,
   logoutController,
   resetPasswordController,
-} from 'controller/UserController';
+} from 'controllers/UserController';
 import { Router } from 'express';
 import { forgotPasswordSchema, loginUserSchema, resetPasswordSchema, userSchemaCreate } from 'validator/UserValidation';
 
