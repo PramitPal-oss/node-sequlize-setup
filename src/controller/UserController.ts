@@ -6,7 +6,7 @@ import {
   ResetPasswordInterface,
   UserInterface,
 } from 'interface/authInterface';
-import { createUserWithApps, forgotPassword, loginUser, logoutServie, resetPassword } from 'service/Auth.Service';
+import { createUserWithApps, forgotPassword, loginUser, logoutServie, resetPassword } from 'service/authService';
 
 export const CreateUserController = catchAsync(async (req: Request, res: Response) => {
   const { first_name, last_name, email } = await createUserWithApps(req.body as UserInterface);
