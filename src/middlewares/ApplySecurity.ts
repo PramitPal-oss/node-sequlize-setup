@@ -1,5 +1,6 @@
 // src/middleware/security.js
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Express } from 'express';
 import helmet from 'helmet';
@@ -32,6 +33,7 @@ export const applySecurity = (app: Express) => {
   );
 
   app.use(express.json({ limit: '50kb' }));
+  app.use(cookieParser());
   app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
   app.use(hpp());
