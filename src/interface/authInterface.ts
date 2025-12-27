@@ -25,3 +25,7 @@ export interface EmailOptionsInterface {
 export interface ForgotpasswordInterface {
   email: string;
 }
+
+export interface ResetPasswordInterface {
+  password: string;
+}

@@ -15,6 +15,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
   declare app_ids?: number[];
   declare password_changed_at: Date | null;
   declare password_reset_token: string | null;
+  declare password_reset_expires: Date | null;
 
   async comparePassword(candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
@@ -34,7 +35,7 @@ class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttribute
 
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    this.password_changed_at = new Date(Date.now() + 10 * 60 * 1000);
+    this.password_reset_expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     this.password_reset_token = hashedToken;
 
     return resetToken;
@@ -111,6 +112,11 @@ UserModel.init(
       type: DataTypes.STRING(255),
       allowNull: true,
       field: 'PASSWORD_RESET_TOKEN',
+    },
+    password_reset_expires: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'PASSWORD_RESET_EXPIRES',
     },
   },
   {

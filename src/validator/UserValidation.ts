@@ -2,7 +2,14 @@ import Joi from 'joi';
 
 export const userSchemaCreate = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).required().alphanum(),
-  password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+  password: Joi.string()
+    .min(8)
+    .pattern(new RegExp('^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$'))
+    .required()
+    .messages({
+      'string.pattern.base': 'Password must contain uppercase, lowercase, number, and special character',
+    }),
+
   email: Joi.string().email().required(),
   first_name: Joi.string().max(100).pattern(new RegExp("^[A-Za-z]+([ '-.][A-Za-z]+)*$")).required(),
   last_name: Joi.string().max(100).pattern(new RegExp("^[A-Za-z]+([ '-.][A-Za-z]+)*$")).required(),
@@ -28,6 +35,15 @@ export const forgotPasswordSchema = Joi.object({
 });
 
 export const resetPasswordSchema = Joi.object({
-  token: Joi.string().required(),
-  new_password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+  password: Joi.string()
+    .min(8)
+    .pattern(new RegExp('^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$'))
+    .required()
+    .messages({
+      'string.pattern.base': 'Password must contain uppercase, lowercase, number, and special character',
+    }),
+
+  confirm_password: Joi.string().valid(Joi.ref('password')).required().messages({
+    'any.only': 'Confirm password must match password',
+  }),
 });
