@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "baseUrl": "./src",
     "paths": {
       "@config/*": ["config/*"],
@@ -16,5 +17,6 @@
       "@middlewares/*": ["middlewares/*"],
       "@loaders/*": ["loaders/*"]
     }
-  }
+  },
+  "include": ["src"]
 }

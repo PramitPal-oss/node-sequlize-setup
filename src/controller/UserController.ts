@@ -6,7 +6,7 @@ import {
   ResetPasswordInterface,
   UserInterface,
 } from 'interface/authInterface';
-import { createUserWithApps, forgotPassword, loginUser, resetPassword } from 'service/Auth.Service';
+import { createUserWithApps, forgotPassword, loginUser, logoutServie, resetPassword } from 'service/Auth.Service';
 
 export const CreateUserController = catchAsync(async (req: Request, res: Response) => {
   const { first_name, last_name, email } = await createUserWithApps(req.body as UserInterface);
@@ -64,5 +64,22 @@ export const resetPasswordController = catchAsync(async (req: Request, res: Resp
   res.status(200).json({
     message: 'Password reset successful',
     user,
+  });
+});
+
+export const logoutController = catchAsync(async (req: Request, res: Response) => {
+  await logoutServie({
+    userId: req.user?.userId,
+    logoutAll: true,
+  });
+
+  res.clearCookie('access_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+
+  res.status(200).json({
+    message: 'Logged out successfully',
   });
 });

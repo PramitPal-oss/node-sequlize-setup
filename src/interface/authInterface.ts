@@ -29,3 +29,8 @@ export interface ForgotpasswordInterface {
 export interface ResetPasswordInterface {
   password: string;
 }
+
+export interface LogoutOptions {
+  userId?: number;
+  logoutAll?: boolean;
+}

@@ -1,9 +1,11 @@
+import { authMiddleware } from '@middlewares/auth';
 import { authLimiter } from '@middlewares/rateLimit';
 import { validate } from '@middlewares/validate';
 import {
   CreateUserController,
   forgotPasswordController,
   LoginUserController,
+  logoutController,
   resetPasswordController,
 } from 'controller/UserController';
 import { Router } from 'express';
@@ -16,5 +18,7 @@ authRoutes.post('/login', authLimiter, validate(loginUserSchema), LoginUserContr
 authRoutes.post('/forgotPassword', authLimiter, validate(forgotPasswordSchema), forgotPasswordController);
 
 authRoutes.post('/resetPassword/:token', authLimiter, validate(resetPasswordSchema), resetPasswordController);
+
+authRoutes.post('./logout', authLimiter, authMiddleware, logoutController);
 
 export default authRoutes;

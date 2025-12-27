@@ -4,7 +4,7 @@ import { sendEmail } from '@utils/email';
 import { generateToken } from '@utils/jwt';
 import crypto from 'crypto';
 import { Request } from 'express';
-import { LoginInterface, UserInterface } from 'interface/authInterface';
+import { LoginInterface, LogoutOptions, UserInterface } from 'interface/authInterface';
 import { AppModel, UserAppModel, UserModel } from 'models';
 import { Op } from 'sequelize';
 
@@ -126,4 +126,17 @@ export const resetPassword = async (token: string, password: string) => {
     user,
     token: jwtToken,
   };
+};
+
+export const logoutServie = async ({ userId, logoutAll }: LogoutOptions) => {
+  if (logoutAll && userId) {
+    await UserModel.update(
+      {
+        password_changed_at: new Date(Date.now() - 1000),
+      },
+      {
+        where: { id: userId },
+      },
+    );
+  }
 };
