@@ -1,8 +1,6 @@
 import { sequelize } from '@config/database';
+import { TodoPriority, TodoStatus } from 'interface/todoInterface';
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-
-export type TodoStatus = 'todo' | 'in_progress' | 'completed';
-export type TodoPriority = 'low' | 'medium' | 'high';
 
 class TodoModel extends Model<InferAttributes<TodoModel>, InferCreationAttributes<TodoModel>> {
   declare id: CreationOptional<number>;
@@ -15,7 +13,6 @@ class TodoModel extends Model<InferAttributes<TodoModel>, InferCreationAttribute
   declare priority: TodoPriority;
 
   declare completed_at: Date | null;
-  declare deleted_at: Date | null;
 }
 
 TodoModel.init(
@@ -54,16 +51,16 @@ TodoModel.init(
     },
 
     status: {
-      type: DataTypes.ENUM('todo', 'in_progress', 'completed'),
+      type: DataTypes.SMALLINT,
       allowNull: false,
-      defaultValue: 'todo',
+      defaultValue: TodoStatus.TODO,
       field: 'STATUS',
     },
 
     priority: {
-      type: DataTypes.ENUM('low', 'medium', 'high'),
+      type: DataTypes.SMALLINT,
       allowNull: false,
-      defaultValue: 'medium',
+      defaultValue: TodoPriority.MEDIUM,
       field: 'PRIORITY',
     },
 
@@ -71,12 +68,6 @@ TodoModel.init(
       type: DataTypes.DATE,
       allowNull: true,
       field: 'COMPLETED_AT',
-    },
-
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      field: 'DELETED_AT',
     },
   },
   {
@@ -92,7 +83,7 @@ TodoModel.init(
 
     hooks: {
       beforeUpdate: (todo) => {
-        if (todo.changed('status') && todo.status === 'completed') {
+        if (todo.changed('status') && todo.status === TodoStatus.COMPLETED && !todo.completed_at) {
           todo.completed_at = new Date();
         }
       },

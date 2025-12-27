@@ -7,9 +7,12 @@ import UserModel from 'models/user.model';
 import { JwtUserPayload } from 'types/jwt';
 
 export const authMiddleware = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies?.access_token || req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : undefined;
 
-  if (!token) return next(new AppError('Unauthorized!', 400, 'Unauthorized'));
+  const token = req.cookies?.access_token || bearerToken;
+
+  if (!token) return next(new AppError('No Token Found!', 401, 'Unauthorized'));
 
   const decoded = jwt.verify(token, env.JWT_SECRET!) as JwtUserPayload;
 
