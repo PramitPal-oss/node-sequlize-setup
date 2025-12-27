@@ -1,4 +1,5 @@
 import AppModel from './app.model';
+import TodoModel from './todo.model';
 import UserModel from './user.model';
 import UserAppModel from './userApp.model';
 
@@ -14,4 +15,13 @@ AppModel.belongsToMany(UserModel, {
   otherKey: 'user_id',
 });
 
-export { AppModel, UserAppModel, UserModel };
+UserModel.hasMany(TodoModel, {
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
+});
+
+TodoModel.belongsTo(UserModel, {
+  foreignKey: 'user_id',
+});
+
+export { AppModel, TodoModel, UserAppModel, UserModel };
