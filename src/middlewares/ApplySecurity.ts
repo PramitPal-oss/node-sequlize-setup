@@ -1,4 +1,5 @@
 // src/middleware/security.js
+import { env } from '@config/env';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -7,6 +8,7 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 
 export const applySecurity = (app: Express) => {
+  console.log(env.CORS_ORIGIN);
   app.disable('x-powered-by');
 
   app.use(
@@ -26,7 +28,7 @@ export const applySecurity = (app: Express) => {
 
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false,
+      origin: env.CORS_ORIGIN ? env.CORS_ORIGIN.split(',') : false,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     }),
